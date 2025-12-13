@@ -4,6 +4,10 @@ const { sequelize } = require("./models");
 const { rootRouter } = require("./routers");
 const app = express();
 const cors = require("cors");
+
+// Kích hoạt lắng nghe sự kiện
+require("./listeners/order.listener");
+
 app.use(cors());
 
 // cài ứng dụng sử dụng kiểu json
@@ -18,11 +22,11 @@ app.use("/api/v1", rootRouter);
 
 // lắng nghe sự kiện kết nối
 app.listen(3000, async () => {
-  console.log("App listening on http://localhost:3000");
-  try {
-    await sequelize.authenticate();
-    console.log("Kết nối thành công đến cơ sở dữ liệu MySQL.");
-  } catch (error) {
-    console.error("Không thể kết nối đến cơ sở dữ liệu MySQL:", error);
-  }
+    console.log("App listening on http://localhost:3000");
+    try {
+        await sequelize.authenticate();
+        console.log("Kết nối thành công đến cơ sở dữ liệu MySQL.");
+    } catch (error) {
+        console.error("Không thể kết nối đến cơ sở dữ liệu MySQL:", error);
+    }
 });
