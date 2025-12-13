@@ -1,4 +1,4 @@
-const eventEmitter = require("../utils/eventEmitter");
+const eventEmitter = require("../utils/event-emitter.util");
 const { sendEmail } = require("../services/emailservice");
 const { Users } = require("../models");
 

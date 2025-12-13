@@ -6,7 +6,7 @@ const {
     Orders,
     Ordersdetail,
 } = require("../models");
-const ProductQueryBuilder = require("../builders/ProductQueryBuilder");
+const ProductQueryBuilder = require("../builders/product-query.builder");
 
 const createProducts = async (req, res) => {
     try {

@@ -1,6 +1,6 @@
 const { Orders, Users, Promotions, Payment } = require("../models");
 const { Op } = require("sequelize");
-const eventEmitter = require("../utils/eventEmitter");
+const eventEmitter = require("../utils/event-emitter.util");
 
 const createOrder = async (req, res) => {
     try {
