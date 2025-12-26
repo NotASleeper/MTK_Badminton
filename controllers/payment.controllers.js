@@ -1,4 +1,5 @@
 const { Payment, Orders } = require("../models");
+const PaymentFactory = require("../services/payment/PaymentFactory");
 const { PaymentPaypal, capturePayment } = require("../services/paypal");
 const { paymentVNPAY } = require("../services/vnpay");
 const crypto = require("crypto");
@@ -7,30 +8,35 @@ require("dotenv").config();
 const createPayment = async (req, res) => {
   try {
     const { orderid, paymentmethod } = req.body;
-    if (paymentmethod === "cash") {
-      const newPayment = await Payment.create({
-        orderid,
-        paymentmethod,
-        status: 0, // Assuming 0 means pending
-      });
-      res.status(201).send(newPayment);
-    } else if (paymentmethod === "paypal") {
-      const payingorder = await Orders.findOne({
-        where: { id: orderid },
-      });
-      if (!payingorder) {
-        return res.status(404).send({ message: "Order not found" });
-      }
-      await PaymentPaypal(payingorder.id, payingorder.totalprice, res);
-    } else {
-      const payingorder = await Orders.findOne({
-        where: { id: orderid },
-      });
-      if (!payingorder) {
-        return res.status(404).send({ message: "Order not found" });
-      }
-      await paymentVNPAY(payingorder.id, payingorder.totalprice, res);
-    }
+    const payingorder = await Orders.findOne({
+      where: { id: orderid },
+    });
+    const paymentStrategy = PaymentFactory.getPaymentStrategy(paymentmethod);
+    await paymentStrategy.pay(req, res, payingorder.totalprice, orderid);
+    // if (paymentmethod === "cash") {
+    //   const newPayment = await Payment.create({
+    //     orderid,
+    //     paymentmethod,
+    //     status: 0, // Assuming 0 means pending
+    //   });
+    //   res.status(201).send(newPayment);
+    // } else if (paymentmethod === "paypal") {
+    //   const payingorder = await Orders.findOne({
+    //     where: { id: orderid },
+    //   });
+    //   if (!payingorder) {
+    //     return res.status(404).send({ message: "Order not found" });
+    //   }
+    //   await PaymentPaypal(payingorder.id, payingorder.totalprice, res);
+    // } else {
+    //   const payingorder = await Orders.findOne({
+    //     where: { id: orderid },
+    //   });
+    //   if (!payingorder) {
+    //     return res.status(404).send({ message: "Order not found" });
+    //   }
+    //   await paymentVNPAY(payingorder.id, payingorder.totalprice, res);
+    // }
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
