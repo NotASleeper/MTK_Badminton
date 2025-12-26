@@ -49,9 +49,21 @@ class CheckoutFacade {
         return sum + item.quantity * (item.Product ? item.Product.price : 0);
       }, 0);
 
-      const discountedTotal = promotion
-        ? totalAmount * (1 - promotion.value / 100)
-        : totalAmount;
+      const {
+        BasePrice,
+        PromotionDecorator
+      } = require("../pricing/PriceComponent");
+
+      let priceComponent = new BasePrice(totalAmount);
+
+      if (promotion) {
+        priceComponent = new PromotionDecorator(
+          priceComponent,
+          promotion.value
+        );
+      }
+
+      const discountedTotal = priceComponent.calculate();
 
       const newOrder = await Orders.create(
         {
