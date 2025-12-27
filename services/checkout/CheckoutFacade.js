@@ -7,6 +7,7 @@ const {
   Carts,
   sequelize,
 } = require("../../models");
+const eventEmitter = require("../../utils/event-emitter.util");
 
 class CheckoutFacade {
   // Xử lý toàn bộ quy trình checkout trong một giao dịch
@@ -51,7 +52,7 @@ class CheckoutFacade {
 
       const {
         BasePrice,
-        PromotionDecorator
+        PromotionDecorator,
       } = require("../pricing/PriceComponent");
 
       let priceComponent = new BasePrice(totalAmount);
@@ -76,6 +77,8 @@ class CheckoutFacade {
         },
         { transaction: t }
       );
+
+      eventEmitter.emit("ORDER_CREATED", newOrder);
 
       const orderDetails = cartItems.map((item) => ({
         orderid: newOrder.id,
